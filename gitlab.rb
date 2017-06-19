@@ -15,7 +15,7 @@ if ENV['ACME_CHALLENGE_PATH']
   registry_nginx['custom_gitlab_server_config'] = nginx_conf
 end
 
-if ENV['VIRTUAL_HOST'].starts_with?('https')
+if ENV['VIRTUAL_HOST'].start_with?('https')
   nginx['ssl_certificate']     = ENV['SSL_CERTIFICATE'] || '/var/certs/selfsigned.crt'
   nginx['ssl_certificate_key'] = ENV['SSL_CERTIFICATE_KEY'] || '/var/certs/selfsigned.key'
 end
