@@ -19,3 +19,16 @@ if ENV['VIRTUAL_HOST'].start_with?('https')
   nginx['ssl_certificate']     = ENV['SSL_CERTIFICATE'] || '/var/certs/selfsigned.crt'
   nginx['ssl_certificate_key'] = ENV['SSL_CERTIFICATE_KEY'] || '/var/certs/selfsigned.key'
 end
+
+# For migration purposes, integrate GitHub OAuth
+if ENV["GITHUB_ID"] && ENV["GITHUB_SECRET"]
+  gitlab_rails['omniauth_providers'] = [
+    {
+      name:       "github",
+      app_id:     ENV.fetch("GITHUB_ID"),
+      app_secret: ENV.fetch("GITHUB_SECRET"),,
+      url:        "https://github.com/",
+      args:       { "scope" => "user:email" }
+    }
+  ]
+end
