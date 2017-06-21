@@ -26,9 +26,9 @@ if ENV["GITHUB_ID"] && ENV["GITHUB_SECRET"]
     {
       name:       "github",
       app_id:     ENV.fetch("GITHUB_ID"),
-      app_secret: ENV.fetch("GITHUB_SECRET"),,
+      app_secret: ENV.fetch("GITHUB_SECRET"),
       url:        "https://github.com/",
-      args:       { "scope" => "user:email" }
+      args:       { scope: "user:email" }
     }
   ]
 end
