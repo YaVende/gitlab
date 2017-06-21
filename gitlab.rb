@@ -15,9 +15,11 @@ if ENV['ACME_CHALLENGE_PATH']
   registry_nginx['custom_gitlab_server_config'] = nginx_conf
 end
 
-if ENV['VIRTUAL_HOST'].start_with?('https')
-  nginx['ssl_certificate']     = ENV['SSL_CERTIFICATE'] || '/var/certs/selfsigned.crt'
-  nginx['ssl_certificate_key'] = ENV['SSL_CERTIFICATE_KEY'] || '/var/certs/selfsigned.key'
+if ENV['SSL_CERTIFICATE'] && ENV['SSL_CERTIFICATE_KEY']
+  nginx['ssl_certificate']              = ENV['SSL_CERTIFICATE']
+  nginx['ssl_certificate_key']          = ENV['SSL_CERTIFICATE_KEY']
+  registry_nginx['ssl_certificate']     = ENV['SSL_CERTIFICATE']
+  registry_nginx['ssl_certificate_key'] = ENV['SSL_CERTIFICATE_KEY']
 end
 
 # For migration purposes, integrate GitHub OAuth
