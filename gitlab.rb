@@ -19,8 +19,8 @@ if ENV['ACME_CHALLENGE_PATH']
 end
 
 # Add config for proxied domains using
-# VIRTUAL_HOSTS_CONFIG="domain:internal_address"
-if ENV['VIRTUAL_HOSTS_CONFIG']
+# PROXY_CONFIG="domain:internal_address"
+if ENV['PROXY_CONFIG']
   ENV.fetch("PROXY_CONFIG").split(/\s*,\s*/).each do |domain_and_port|
     domain, uri = domain_and_port.split(':', 2)
 
