@@ -24,9 +24,18 @@ if ENV['VIRTUAL_HOSTS_CONFIG']
   ENV.fetch("PROXY_CONFIG").split(/\s*,\s*/).each do |domain_and_port|
     domain, uri = domain_and_port.split(':', 2)
 
+    acme_challenge_config =
+      ENV['ACME_CHALLENGE_PATH'] && <<-CONF
+        location ^~ /.well-known {
+          root #{ENV.fetch('ACME_CHALLENGE_PATH')};
+        }
+      CONF
+
     nginx['custom_gitlab_server_config'] += <<-CONF
       server {
         server_name #{domain};
+
+        #{acme_challenge_config}
 
         location / {
           proxy_redirect off;
