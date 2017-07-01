@@ -18,38 +18,6 @@ if ENV['ACME_CHALLENGE_PATH']
   registry_nginx['custom_gitlab_server_config'] = nginx_conf
 end
 
-# Add config for proxied domains using
-# PROXY_CONFIG="domain:internal_address"
-if ENV['PROXY_CONFIG']
-  ENV.fetch("PROXY_CONFIG").split(/\s*,\s*/).each do |domain_and_port|
-    domain, uri = domain_and_port.split(':', 2)
-
-    acme_challenge_config =
-      ENV['ACME_CHALLENGE_PATH'] && <<-CONF
-        location ^~ /.well-known {
-          root #{ENV.fetch('ACME_CHALLENGE_PATH')};
-        }
-      CONF
-
-    nginx['custom_gitlab_server_config'] += <<-CONF
-      server {
-        server_name #{domain};
-
-        #{acme_challenge_config}
-
-        location / {
-          proxy_redirect off;
-          proxy_set_header Host $http_host;
-          proxy_set_header X-Forward-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $scheme;
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_pass #{uri};
-        }
-      }
-    CONF
-  end
-end
-
 if ENV['SSL_CERTIFICATE'] && ENV['SSL_CERTIFICATE_KEY']
   nginx['ssl_certificate']              = ENV['SSL_CERTIFICATE']
   nginx['ssl_certificate_key']          = ENV['SSL_CERTIFICATE_KEY']
