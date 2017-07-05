@@ -10,7 +10,7 @@ elif [[ $CI_COMMIT_REF_NAME =~ ^master$ ]]; then
   exit 0
 
 # If CI_COMMIT_REF_NAME is development
-elif [[ $CI_COMMIT_REF_NAME =~ ^master$ ]]; then
+elif [[ $CI_COMMIT_REF_NAME =~ ^development$ ]]; then
   echo development
   exit 0
 
