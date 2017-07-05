@@ -3,26 +3,35 @@
 external_url ENV.fetch('VIRTUAL_HOST') if ENV['VIRTUAL_HOST']
 registry_external_url ENV.fetch('REGISTRY_VIRTUAL_HOST') if ENV['REGISTRY_VIRTUAL_HOST']
 
-nginx['custom_gitlab_server_config'] ||= ''
-registry_nginx['custom_gitlab_server_config'] ||= ''
+if ENV['ENABLE_NGINX'] =~ /true|1|yes/
+  nginx['enable'] = true
 
-# For usage with letsencrypt
-if ENV['ACME_CHALLENGE_PATH']
-  nginx_conf = <<-CONF
-    location ^~ /.well-known {
-      root #{ENV.fetch('ACME_CHALLENGE_PATH')};
-    }
-  CONF
+  nginx['custom_gitlab_server_config'] ||= ''
+  registry_nginx['custom_gitlab_server_config'] ||= ''
 
-  nginx['custom_gitlab_server_config'] = nginx_conf
-  registry_nginx['custom_gitlab_server_config'] = nginx_conf
-end
+  # For usage with letsencrypt
+  if ENV['ACME_CHALLENGE_PATH']
+    nginx_conf = <<-CONF
+      location ^~ /.well-known {
+        root #{ENV.fetch('ACME_CHALLENGE_PATH')};
+      }
+    CONF
 
-if ENV['SSL_CERTIFICATE'] && ENV['SSL_CERTIFICATE_KEY']
-  nginx['ssl_certificate']              = ENV['SSL_CERTIFICATE']
-  nginx['ssl_certificate_key']          = ENV['SSL_CERTIFICATE_KEY']
-  registry_nginx['ssl_certificate']     = ENV['SSL_CERTIFICATE']
-  registry_nginx['ssl_certificate_key'] = ENV['SSL_CERTIFICATE_KEY']
+    nginx['custom_gitlab_server_config'] = nginx_conf
+    registry_nginx['custom_gitlab_server_config'] = nginx_conf
+  end
+
+  if ENV['SSL_CERTIFICATE'] && ENV['SSL_CERTIFICATE_KEY']
+    nginx['ssl_certificate']              = ENV['SSL_CERTIFICATE']
+    nginx['ssl_certificate_key']          = ENV['SSL_CERTIFICATE_KEY']
+    registry_nginx['ssl_certificate']     = ENV['SSL_CERTIFICATE']
+    registry_nginx['ssl_certificate_key'] = ENV['SSL_CERTIFICATE_KEY']
+  end
+else
+  nginx['enable']                  = false
+  unicorn['enable']                = false
+  gitlab_rails['internal_api_url'] = ENV.fetch('INTERNAL_API_URL')
+  web_server['external_users']     = ENV.fetch('EXTERNAL_USERS')
 end
 
 # For migration purposes, integrate GitHub OAuth
