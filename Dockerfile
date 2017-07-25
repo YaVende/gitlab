@@ -1,4 +1,11 @@
 FROM gitlab/gitlab-ce:9.3.2-ce.0
-COPY gitlab.rb /etc/gitlab/gitlab.rb
+RUN apt-get update -qq
+RUN apt-get install -y tinyproxy
+
+COPY entrypoint.sh /entrypoint.sh
+COPY gitlab.rb /tmp/gitlab.rb
 COPY certs/selfsigned.crt /var/certs/
 COPY certs/selfsigned.key /var/certs/
+
+ENTRYPOINT ["/bin/bash"]
+CMD ["entrypoint.sh"]

@@ -1,7 +1,11 @@
 # Entire settings list
 # https://gitlab.com/gitlab-org/omnibus-gitlab/raw/master/files/gitlab-config-template/gitlab.rb.template
-external_url ENV.fetch('VIRTUAL_HOST') if ENV['VIRTUAL_HOST']
-registry_external_url ENV.fetch('REGISTRY_VIRTUAL_HOST') if ENV['REGISTRY_VIRTUAL_HOST']
+
+external_url ENV.fetch('EXTERNAL_URL') if ENV['EXTERNAL_URL']
+registry_external_url ENV.fetch('REGISTRY_EXTERNAL_URL') if ENV['REGISTRY_EXTERNAL_URL']
+
+# Expose the registry, default is localhost:5000
+registry['registry_http_addr'] = "0.0.0.0:5000"
 
 if ENV['ENABLE_NGINX'] =~ /true|1|yes/
   nginx['enable'] = true
@@ -28,10 +32,15 @@ if ENV['ENABLE_NGINX'] =~ /true|1|yes/
     registry_nginx['ssl_certificate_key'] = ENV['SSL_CERTIFICATE_KEY']
   end
 else
-  nginx['enable']                  = false
-  unicorn['enable']                = false
-  gitlab_rails['internal_api_url'] = ENV.fetch('INTERNAL_API_URL')
-  web_server['external_users']     = ENV.fetch('EXTERNAL_USERS')
+  # Disable all internal components
+  nginx['enable']      = false
+  prometheus['enable'] = false
+end
+
+if ENV['WEB_SERVER_CONFIG']
+  require 'json'
+  config = JSON.parse(ENV.fetch('WEB_SERVER_CONFIG'))
+  config.each { |k,v| web_server[k] = v }
 end
 
 # For migration purposes, integrate GitHub OAuth
