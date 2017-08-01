@@ -1,5 +1,4 @@
 FROM gitlab/gitlab-ce:9.4.3-ce.0
-RUN apt-get update -qq
 
 COPY entrypoint.sh /entrypoint.sh
 COPY gitlab.rb /tmp/gitlab.rb
